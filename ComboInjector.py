@@ -13,8 +13,6 @@ improved readability
 from collections import deque
 import numpy as np
 
-from dataclasses import dataclass
-
 class ComboInjector(object):
     """
     A utility class for injecting combos, special moves, and basic actions
@@ -506,6 +504,17 @@ class ComboInjector(object):
         repeated = np.random.choice(['l+', 'dl+', 'd+', 'dr+', 'r+'])
         length = np.random.randint(repeat_min//self.frame_skip, repeat_max//self.frame_skip)
         return [repeated] * length
+    
+    def sample_jump_action(self, prob_super_jump=0.15) -> list:
+        roll = np.random.rand()
+        # 15% chance to do some lateral movement, otherwise random repeated direction
+        if roll < prob_super_jump:
+            # e.g. 'r+' or 'l+', plus a filler '+'
+            move = [['d+', 'ul+'], ['d+', 'u+'], ['d+', 'ur+']][np.random.randint(3)]
+            return move
+        # Otherwise choose a repeated direction
+        jump = np.random.choice(['ul+', 'u+', 'ur+'])
+        return [jump]
 
     def string_to_idx(self, string_list: list):
         idx_list = []
@@ -577,7 +586,7 @@ class ComboInjector(object):
                 roll = np.random.rand()
                 if roll < probs[0]:
                     # Jump or overhead action placeholder
-                    seq_str = [np.random.choice(['ul+', 'u+', 'ur+'])]
+                    seq_str = self.sample_jump_action()
                     self.agent_state[agent_id]['move_sequence'] = deque(self.string_to_idx(seq_str))
                 elif roll < probs[1]:
                     # Single basic action
