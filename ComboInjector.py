@@ -4,10 +4,9 @@ Created on Thu Dec 26 10:12:02 2024
 
 ComboInjector class for managing combos, actions, and special moves
 in a fighting game environment. Supports configurable probabilities for
-different action categories (jump/movement/basic/combos), error handling, and
-improved readability
+different action categories (jump/movement/basic/combos).
 
-@author: ruhe
+Author: ruhe
 """
 
 from collections import deque
@@ -25,40 +24,62 @@ class ComboInjector(object):
         Name of the environment (default 'sfiii').
     mode : str
         Action mode (must be 'multi_discrete' currently).
+    frame_skip : int
+        Frame skip value that can affect certain hold/charge durations.
     characters : dict
-        Dict of game_name -> list of character names.
+        Nested dictionary mapping environment -> {character -> {move definitions}}.
+        Each move definition has a 'prob' for sampling, plus 'combo_str' specifying
+        how to generate that move sequence.
     base_movement_names : dict
-        Mapping of short keys ('l', 'r', etc.) to movement arrays.
+        Mapping of short string direction keys to multi-discrete arrays for movement.
     base_attack_names : dict
-        Mapping of short keys ('lp', 'hp', etc.) to attack arrays.
+        Mapping of short string attack keys to multi-discrete arrays for attack.
+    _base_actions : list of str
+        Flattened list of "movement+attack" combos for indexing.
     action_idx_lookup : dict
-        Maps string combos like 'l+lp' to integer action indices.
+        Maps a combo string (e.g. 'd+lp') to an integer index.
     input_lookup : dict
-        Maps an integer action index back to the final multi-discrete array.
+        Maps integer action indices back to multi-discrete arrays for the environment.
     move_pattern_names : dict
-        Named movement patterns for quarter circles, half circles, etc.
-    move_sequence : dict
-        Tracks the queued moves for each player.
+        Named movement patterns (e.g., quarter-circles, half-circles).
+    agent_state : dict
+        Stores per-agent info such as:
+          - 'move_sequence': deque of action indices queued
+          - 'character': str name of selected character
+          - 'super_art': int representing chosen super art
 
     Methods
     -------
-    reset([character_1, ...], [super_art_1, ...]):
-        Clear stored move sequences for each agent/player and initialize agent states.
-    in_sequence(player: str) -> bool:
-        Returns True if the specified player still has queued moves.
-    action_space_size() -> int:
-        Returns the size of the known action space (if relevant).
-    sample_character_special(character: str, super_art: int) -> List[str]:
-        Samples a special move sequence for a given character & super art.
-    sample_movement_action() -> List[str]:
-        Samples a basic movement pattern or repeated direction inputs.
-    sample(combo: bool = True, 
-           prob_jump: float = 0.04, 
-           prob_basic: float = 0.25, 
-           prob_combos: float = 0.70, 
-           prob_movement: float = 0.40,
-           vs: bool = False) -> Union[int, tuple]:
-        Main entry point to sample an action (or tuple of actions) for single / vs mode.
+    reset(characters, super_arts)
+        Clear any stored move sequences for each agent and store their chosen characters
+        and super arts.
+    in_sequence(player: str) -> bool
+        Check if the specified player (agent) still has queued moves to execute.
+    _combine_actions(move_string: str, attack_string: str) -> list of str
+        Internal helper to produce a list of "move+attack" strings from standard patterns.
+    _hold_direction(direction, min_frame, max_frame, release='') -> list of str
+        Internal helper for charge-style moves by holding a direction for a random length
+        of time, then optionally releasing an attack.
+    _repeat_attack(attack_string, min_repeats, max_repeats, tap='') -> list of str
+        Internal helper for repeated button presses (e.g., repeated punch).
+    _raw_action_string(action_string: str) -> list of str
+        Splits an action string by underscore, used for direct parsing.
+    _decode_action_string(action_string: str) -> list of str
+        Parses custom combo syntax into a final list of 'dir+attack' tokens.
+    action_space_size() -> int
+        Returns the total number of possible "movement+attack" combos in multi-discrete form.
+    sample_character_special(player: str) -> list of str
+        Generates a special or super-art combo for the given agent's character.
+    sample_movement_action(prob_dash=0.15, repeat_min=12, repeat_max=64) -> list of str
+        Samples movement patterns or repeated directional inputs (e.g. dashes).
+    sample_jump_action(prob_super_jump=0.15) -> list of str
+        Samples a jump sequence, optionally super jump if rand < prob_super_jump.
+    string_to_idx(string_list: list) -> list of int
+        Converts each 'dir+attack' token into an integer action index; handles KeyError fallback.
+    sample(prob_jump=0.04, prob_basic=0.21, prob_combo=0.35, prob_cancel=0.20, prob_movement=0.30)
+        Main entry point to produce the next action(s) for all agents. Each agent either continues
+        a queued sequence or samples a new set of moves based on given probabilities. Returns a dict
+        containing both discrete indices and multi-discrete arrays for each agent.
     """
     
     def __init__(self,
@@ -74,6 +95,8 @@ class ComboInjector(object):
             Name of the environment (default is 'sfiii').
         mode : str, optional
             Action mode (must be 'multi_discrete'); future expansion possible.
+        frame_skip : int, optional
+            Frame skip value that affects the duration of certain hold combos (default 4).
         """
 
         self.environment_name = environment_name
@@ -84,7 +107,7 @@ class ComboInjector(object):
         if self.mode != 'multi_discrete':
             raise ValueError("Only 'multi_discrete' mode is currently supported.")
             
-        # Characters available for the environment
+        # Characters and possible moves (as a nested dict)
         self.characters = {
             'sfiii': {
                 "Alex" : {'power_bomb' : {'prob': 0.15, 'combo_str' : 'comb_hc_p'},
@@ -258,7 +281,6 @@ class ComboInjector(object):
             )
 
         # Base movement definitions (multi-discrete)
-        # The first array entry is the directional input, second is always 0 for movement only.
         self.base_movement_names = {
             '':   np.array([0, 0]),
             'l':  np.array([1, 0]),
@@ -272,7 +294,6 @@ class ComboInjector(object):
         }
 
         # Base attack definitions (multi-discrete)
-        # The first array entry is always 0 for no directional component, second is the attack.
         self.base_attack_names = {
             '':    np.array([0, 0]),
             'lp':  np.array([0, 1]),
@@ -292,6 +313,7 @@ class ComboInjector(object):
             for attack_name, attack_arr in self.base_attack_names.items():
                 combo_str = f'{move_name}+{attack_name}'
                 self._base_actions.append(combo_str)
+                
         # Map combo string -> index
         self.action_idx_lookup = {
             combo_str: i for i, combo_str in enumerate(self._base_actions)
@@ -322,12 +344,24 @@ class ComboInjector(object):
             'sul':  ['d', 'ul'],
         }
 
+        # Store per-agent state (character, super_art, move_sequence, etc.)
         self.agent_state = {}
         
     def reset(self, characters, super_arts):
         """
-        Clear stored move sequences for each agent (player).
-        Typically called between episodes or after environment resets.
+        Reset or initialize agent states.
+
+        Parameters
+        ----------
+        characters : list of str
+            A list of character names for each agent, e.g. ['Alex', 'Ken'].
+        super_arts : list of int
+            A list of super art indices for each agent, e.g. [1, 3].
+
+        Raises
+        ------
+        NotImplementedError
+            If the chosen character or super art is not supported.
         """
         self.agent_state = {}
         for i, (character, super_art) in enumerate(zip(characters, super_arts)):
@@ -341,21 +375,39 @@ class ComboInjector(object):
         
     def in_sequence(self, player: str) -> bool:
         """
-        Check if the specified player's sequence is non-empty.
+        Check if the specified player's sequence is non-empty (still queued up moves).
 
         Parameters
         ----------
         player : str
-            e.g. 'agent_0', 'agent_1', etc.
+            The agent key, e.g. 'agent_0' or 'agent_1'.
 
         Returns
         -------
         bool
-            True if there are still queued moves, False otherwise.
+            True if there are queued moves, False otherwise.
         """
         return len(self.agent_state[player]['move_sequence']) > 0
     
-    def _combine_actions(self, move_string, attack_string):
+    def _combine_actions(self, move_string: str, attack_string: str) -> list:
+        """
+        Internal helper that stitches together a movement pattern with an attack.
+
+        Parameters
+        ----------
+        move_string : str
+            A short code indicating a special pattern (e.g. 'qc', '2qc', 'dp', 'lr') or
+            literal direction.
+        attack_string : str
+            A code for the type of attack (e.g. 'p', 'k', 'lp').
+
+        Returns
+        -------
+        list of str
+            Each element is e.g. 'd+lp' or 'r+lk', forming a sequence.
+        """
+        
+        # Parse the move_string to get a movement list
         if move_string == 'qc':
             m_seq = self.move_pattern_names[np.random.choice(['rqc', 'lqc'])]
         elif move_string == '2qc':
@@ -375,6 +427,7 @@ class ComboInjector(object):
         else:
             m_seq = [move_string]
         
+        # Decide the final attack
         if attack_string == 'p':
             a = np.random.choice(['lp', 'mp', 'hp'])
         elif attack_string == 'k':
@@ -382,59 +435,138 @@ class ComboInjector(object):
         else:
             a = attack_string
 
+        # Align them so that the last move gets the attack
         a_seq = [''] * (len(m_seq) - 1) + [a]
-        return [f"{i}+{ii}" for i, ii in zip(m_seq, a_seq)]
+        return [f"{m}+{atk}" for m, atk in zip(m_seq, a_seq)] 
     
-    def _hold_direction(self, direction, min_frame, max_frame, release=''):
+    def _hold_direction(self, direction: str, min_frame: str, max_frame: str, release: str = '') -> list:
+        """
+        Internal helper for a "hold direction" move, e.g. hold down for N frames, then release.
+
+        Parameters
+        ----------
+        direction : str
+            e.g. 'd', 'lr' indicating the direction to hold.
+        min_frame : str
+            Minimum frames to hold (string from the combo_str).
+        max_frame : str
+            Maximum frames to hold (string from the combo_str).
+        release : str, optional
+            If 'p' or 'k', we pick a random punch/kick attack upon release. Otherwise literal.
+
+        Returns
+        -------
+        list of str
+            e.g. ['d+','d+','d+','u+lk'] if we hold down for 3 steps, then release with 'lk'.
+        """
         
+        min_f = int(min_frame)
+        max_f = int(max_frame)
+        
+        # Determine the release attack if applicable
         if release == 'p':
             release = np.random.choice(['lp', 'mp', 'hp'])
         elif release == 'k':
             release = np.random.choice(['lk', 'mk', 'hk'])
             
-        num_steps = np.random.randint(int(min_frame)//self.frame_skip, (int(max_frame)+1)//self.frame_skip)
+        num_steps = np.random.randint(min_f // self.frame_skip, (max_f + 1) // self.frame_skip)
         
+        # Build the direction sequence
         if direction == 'd':
-            m1 = np.random.choice(['d', 'dl', 'dr'])
-            m2_seq = []
+            dir_held = np.random.choice(['d', 'dl', 'dr'])
+            # If there's a release, append 'u' after
+            # Example: hold [d, d, d], then 'u'
+            m_seq = [dir_held] * num_steps
             if release:
-                m2_seq = ['u']
-            m_seq = [m1] * num_steps + m2_seq
+                m_seq.append('u')
             a_seq = [''] * (len(m_seq) - bool(release)) + [release] * bool(release)
             
         elif direction == 'lr':
-            m1 = np.random.choice(['l', 'dl', 'dr', 'r'])
-            m2_seq = []
+            dir_held = np.random.choice(['l', 'dl', 'dr', 'r'])
+            m_seq = [dir_held] * num_steps  
+            # If there's a release, we do the opposite direction or something else
             if release:
-                m2_seq = ['l'] if m1.endswith('r') else ['r']
-            m_seq = [m1] * num_steps + m2_seq
+                m_seq.append('l' if dir_held.endswith('r') else 'r')
             a_seq = [''] * (len(m_seq) - bool(release)) + [release] * bool(release)
-
-        return [f"{i}+{ii}" for i, ii in zip(m_seq, a_seq)]
+        
+        else:
+            # fallback
+            m_seq = [direction]
+            a_seq = ['']
+            
+        return [f"{m}+{atk}" for m, atk in zip(m_seq, a_seq)]
     
-    def _repeat_attack(self, attack_string, min_repeats, max_repeats, tap=''):
-        tap = bool(tap)
+    def _repeat_attack(self, attack_string: str, min_repeats: str, max_repeats: str, tap: str = '') -> list:
+        """
+        Internal helper for repeated button presses (e.g., repeated punch or kick).
+
+        Parameters
+        ----------
+        attack_string : str
+            e.g. 'p', 'k', 'lp', 'mk'
+        min_repeats : str
+            Minimum number of repeats (string from combo_str).
+        max_repeats : str
+            Maximum number of repeats (string from combo_str).
+        tap : str
+            If not empty, means we insert a '+' after each attack to create a "tap" pattern.
+
+        Returns
+        -------
+        list of str
+            e.g. ['+lp', '+', '+lp', '+', '+lp'] for 3 repeated taps.
+        """
+        min_r = int(min_repeats)
+        max_r = int(max_repeats)
+        do_tap = bool(tap)
+        
+        # If the code is 'p' or 'k', pick a specific punch/kick
         if attack_string == 'p':
             attack_string = np.random.choice(['lp', 'mp', 'hp'])
         elif attack_string == 'k':
             attack_string = np.random.choice(['lk', 'mk', 'hk'])
             
-        seq = ['+' + attack_string] + ['+'] * tap
-        return seq * np.random.randint(int(min_repeats), int(max_repeats)+1)
-    
-    def _raw_action_string(self, action_string):
-        return action_string.split('_')
-    
-    def _decode_action_string(self, action_string):
+        reps = np.random.randint(min_r, max_r + 1)
+        seq = [f'+{attack_string}'] + ['+'] * do_tap
+        return seq * reps
+       
+    def _decode_action_string(self, action_string: str) -> list:
+        """
+        Parse the custom combo syntax into final 'dir+attack' tokens.
+
+        Each sub-string is separated by '/', and each chunk is something like:
+            'comb_qc_p' or 'hold_d_16_64_k' or 'rep_p_0_8_t'.
+
+        Parameters
+        ----------
+        action_string : str
+            e.g. 'comb_qc_p/rep_p_0_8_t'
+
+        Returns
+        -------
+        list of str
+            Final list e.g. ['d+lp','dr+lp','r+lp'] after expansions.
+        """
         action_sequence = []
-        for sub_string in action_string.split('/'):
-            sub_string = sub_string.split('_')
-            if sub_string[0] == 'comb':
-                action_sequence += self._combine_actions(sub_string[1], sub_string[2])
-            elif sub_string[0] == 'hold':
-                action_sequence += self._hold_direction(*sub_string[1:])
-            elif sub_string[0] == 'rep':
-                action_sequence += self._repeat_attack(*sub_string[1:])
+        # A single action_string can have multiple segments delimited by '/'
+        for sub_part  in action_string.split('/'):
+            parts = sub_part.split('_')
+            # e.g. parts might be ['comb', 'qc', 'p'] or ['hold','d','16','64','k']
+            if parts[0] == 'comb':
+                # comb_qc_p
+                move_str, attack_str = parts[1], parts[2]
+                action_sequence += self._combine_actions(move_str, attack_str)
+            elif parts[0] == 'hold':
+                # hold_direction
+                direction, min_frame, max_frame, release = parts[1:]
+                action_sequence += self._hold_direction(direction, min_frame, max_frame, release)
+            elif parts[0] == 'rep':
+                # repeated attack
+                attack_str, min_r, max_r, tap_str = parts[1:]
+                action_sequence += self._repeat_attack(attack_str, min_r, max_r, tap_str)
+            elif parts[0] == 'raw':
+                # raw_+lp => literal tokens
+                action_sequence += parts[1:]
                 
         return action_sequence
     
@@ -449,29 +581,19 @@ class ComboInjector(object):
         """
         return len(self._base_actions)
         
-    def sample_character_special(self, player) -> list:
+    def sample_character_special(self, player: str) -> list:
         """
-        Returns a list of combos in the form ['d+lp', 'dr+lp', 'r+lp', ...]
-        for a particular character + super_art level.
-
-        This method contains custom combos/roll logic for each character.
+        Generates a special or super-art combo for the given agent's character.
 
         Parameters
         ----------
-        character : str
-            Name of the character to sample from (e.g. 'Gouki', 'Chun-Li', etc.)
-        super_art : int
-            Indicates which super art is selected (1, 2, or 3), used in some combos.
+        player : str
+            e.g. 'agent_0', referencing self.agent_state[player].
 
         Returns
         -------
         list of str
-            e.g. ['d+lp', 'dr+lp', 'r+lp'] or an empty list if no combos are found.
-
-        Raises
-        ------
-        NotImplementedError
-            If the character is not recognized or not implemented.
+            A list of combos in the form ['d+lp', 'dr+lp', 'r+lp', ...] or fallback if not found.
         """
         
         character = self.agent_state[player]['character']
@@ -480,21 +602,44 @@ class ComboInjector(object):
         if character not in self.characters[self.environment_name]:
             raise NotImplementedError(f"Character '{character}' not supported yet.")
             
+        # Weighted random selection among that character's moves
         roll = np.random.rand()
-        prob_sum = 1
-        for move, params in self.characters[self.environment_name][character].items():
-            prob_sum -= params['prob']
-            if roll >= prob_sum:
-                suffix = ''
-                if move == 'super_art':
+        moves_dict = self.characters[self.environment_name][character]
+        
+        # We sum up probabilities to pick a move
+        prob_acc = 0.0        
+        for move_name, params in moves_dict.items():
+            prob_acc += params['prob']
+            if roll <= prob_acc:
+                # If this is a super_art, we pick the appropriate suffix
+                if move_name == 'super_art':
+                    # e.g. 'combo_str_2'
                     suffix = f"_{super_art}"
-                return self._decode_action_string(params['combo_str'+suffix])
+                    combo_key = 'combo_str' + suffix
+                    action_str = params[combo_key]
+                    return self._decode_action_string(action_str)
+                else:
+                    # Normal move
+                    action_str = params['combo_str']
+                    return self._decode_action_string(action_str)
+        # If none matched (sum of probabilities < 1?), fallback
         return [np.random.choice(self._base_actions)]
             
-    def sample_movement_action(self, prob_dash=0.15, repeat_min=12, repeat_max=64) -> list:
+    def sample_movement_action(self,
+                               prob_dash: float = 0.15,
+                               repeat_min: int = 12,
+                               repeat_max: int = 64) -> list:
         """
-        Sample a basic movement action, possibly including quick repeated directions
-        or short combos involving directions.
+        Samples a movement pattern or repeated directional inputs (e.g. dashes).
+
+        Parameters
+        ----------
+        prob_dash : float, optional
+            Probability of a short dash pattern like ['r+','+','r+'] (default 0.15).
+        repeat_min : int, optional
+            Minimum frames for repeated direction (default 12).
+        repeat_max : int, optional
+            Maximum frames for repeated direction (default 64).
 
         Returns
         -------
@@ -502,12 +647,11 @@ class ComboInjector(object):
             e.g. ['r+', '+', 'r+'] or repeated directional combos.
         """
         roll = np.random.rand()
-        # 15% chance to do some lateral movement, otherwise random repeated direction
         if roll < prob_dash:
-            # e.g. 'r+' or 'l+', plus a filler '+'
             move = np.random.choice(['r+', 'l+'])
             return [move, '+', move]
-        # Otherwise choose a repeated direction
+        
+        # Otherwise repeated direction        
         repeated = np.random.choice(['l+', 'dl+', 'd+', 'dr+', 'r+'])
         length = np.random.randint(repeat_min//self.frame_skip, repeat_max//self.frame_skip)
         return [repeated] * length
@@ -516,14 +660,35 @@ class ComboInjector(object):
         roll = np.random.rand()
         # 15% chance to do some lateral movement, otherwise random repeated direction
         if roll < prob_super_jump:
-            # e.g. 'r+' or 'l+', plus a filler '+'
-            move = [['d+', 'ul+'], ['d+', 'u+'], ['d+', 'ur+']][np.random.randint(3)]
-            return move
-        # Otherwise choose a repeated direction
-        jump = np.random.choice(['ul+', 'u+', 'ur+'])
-        return [jump]
+            # super jump pattern
+            moves = [
+                ['d+', 'ul+'],
+                ['d+', 'u+'],
+                ['d+', 'ur+'],
+            ]
+            return moves[np.random.randint(len(moves))]
+        else:
+            # normal jump
+            return [np.random.choice(['ul+', 'u+', 'ur+'])]
 
-    def string_to_idx(self, string_list: list):
+    def string_to_idx(self, string_list: list) -> list:
+        """
+        Convert each 'dir+attack' token into an integer action index.
+
+        Parameters
+        ----------
+        string_list : list of str
+            e.g. ['d+lp', 'dr+lp', 'r+lp'].
+
+        Returns
+        -------
+        list of int
+            The integer indices corresponding to each token.
+
+        Notes
+        -----
+        If a token is not found in self.action_idx_lookup, a random fallback is used.
+        """
         idx_list = []
         for s in string_list:
             try:
@@ -531,7 +696,6 @@ class ComboInjector(object):
             except KeyError:
                 # If something fails, we skip
                 print(f"{s} not found in action lookup")
-                print(string_list)
                 idx_list.append(np.random.randint(0, len(self.action_idx_lookup)))
         return idx_list
 
@@ -542,85 +706,91 @@ class ComboInjector(object):
                prob_cancel: float = 0.2,
                prob_movement: float = 0.3):
         """
-        Main entry point to sample an action for single or vs mode.
-        In single mode, returns a single integer (action index).
-        In vs mode, returns a tuple of two integers for agent_0, agent_1.
+        Main entry point to produce the next action(s) for all agents.
 
-        The method picks from:
-          - jump / overhead moves,
-          - basic single-step actions,
-          - combos or special sequences,
-          - movement actions
+        Each agent either continues any queued sequence or samples a new set of moves
+        based on the given probabilities. The result is a dictionary containing both
+        discrete indices and multi-discrete arrays for each agent.
 
-        Probabilities can be configured by the user.
+        Probabilities:
+          - prob_jump:    e.g. 0.04 chance for a jump action
+          - prob_basic:   e.g. 0.21 chance for a single random basic action
+          - prob_combo:   e.g. 0.35 chance to sample a special/super combo
+          - prob_cancel:  e.g. 0.20 chance to truncate the combo early
+          - prob_movement:e.g. 0.30 chance for a movement-based pattern
 
         Parameters
         ----------
-        combo : bool, optional
-            Whether combos are allowed in sampling (default True).
         prob_jump : float, optional
-            Probability to select a "jump" action or overhead action. (default 0.04)
+            Probability to pick a jump action (default 0.04).
         prob_basic : float, optional
-            Probability to pick a single random basic action (default 0.25)
-        prob_combos : float, optional
-            Probability to sample a special combo (default 0.70)
+            Probability to pick a single random basic action (default 0.21).
+        prob_combo : float, optional
+            Probability to pick a special combo for the character (default 0.35).
         prob_cancel : float, optional
-            Probability that a combo will terminate early (default 0.20)
+            Probability to truncate the combo (default 0.20).
         prob_movement : float, optional
-            Probability to do movement-based combos (default 0.40)
-        vs : bool, optional
-            Whether we are sampling for two players (default False).
+            Probability to pick a movement-based action (default 0.30).
 
         Returns
         -------
-        int or (int, int)
-            If vs=False, returns a single integer action.
-            If vs=True, returns a tuple (action_0, action_1).
+        dict
+            {
+              'discrete': {'agent_0': int, 'agent_1': int, ...},
+              'multi_discrete': {'agent_0': [x,y], 'agent_1': [x,y], ...}
+            }
 
         Notes
         -----
-        - This snippet references `self.sample_character_special(...)` and
-          `self.sample_movement_action()`. Ensure you have a way to pick the correct
-          character & super art for each agent if needed.
+        1. We sum (prob_jump + prob_basic + prob_combo + prob_movement) and normalize.
+        2. For each agent, if no moves remain in their queue, we roll a random number
+           and pick from the categories.
+        3. Once a new sequence is sampled, we store it in the agent's 'move_sequence' deque.
+        4. Finally, we pop one action from each agent's queue and return it.
         """
         actions = {'discrete' : {},
                    'multi_discrete' : {}}
-        probs = np.array([prob_jump, prob_basic, prob_combo, prob_movement])
-        probs = probs / probs.sum()
-        probs = np.cumsum(probs)
+        
+        # Normalize probabilities
+        raw_probs = np.array([prob_jump, prob_basic, prob_combo, prob_movement])
+        raw_probs /= raw_probs.sum()  # ensure they sum to 1
+        cdfs = np.cumsum(raw_probs)
+        
+        # For each agent, pick next action if needed
         for agent_id in self.agent_state:
             if not self.in_sequence(agent_id):
                 roll = np.random.rand()
-                if roll < probs[0]:
-                    # Jump or overhead action placeholder
+                # Decide which category
+                if roll < cdfs[0]:
+                    # Jump
                     seq_str = self.sample_jump_action()
-                    self.agent_state[agent_id]['move_sequence'] = deque(self.string_to_idx(seq_str))
-                elif roll < probs[1]:
-                    # Single basic action
+                    seq_idx = self.string_to_idx(seq_str)
+                    self.agent_state[agent_id]['move_sequence'] = deque(seq_idx)
+                elif roll < cdfs[1]:
+                    # Basic single action
                     single_idx = np.random.randint(0, len(self.action_idx_lookup))
                     self.agent_state[agent_id]['move_sequence'] = deque([single_idx])
-                elif roll < probs[2]:
+                elif roll < cdfs[2]:
+                    # Character-specific combos
                     seq_str = self.sample_character_special(agent_id)
-                    # Convert string combos to indices if possible
                     seq_idx = self.string_to_idx(seq_str)
-                    cancel_roll = np.random.rand()
-                    # Possibly shorten the sequence
-                    if cancel_roll < prob_cancel:
-                        cutoff = np.random.randint(1, len(seq_idx)+1)
+                    # Possibly cancel early
+                    if np.random.rand() < prob_cancel:
+                        cutoff = np.random.randint(1, len(seq_idx) + 1)
                         seq_idx = seq_idx[:cutoff]
                     self.agent_state[agent_id]['move_sequence'] = deque(seq_idx)
                 else:
                     # Movement-based combos
                     move_seq_str = self.sample_movement_action()
-                    # Convert to indices
                     seq_idx = self.string_to_idx(move_seq_str)
                     self.agent_state[agent_id]['move_sequence'] = deque(seq_idx)
                     
+            # Pop the next action
             a_idx = self.agent_state[agent_id]['move_sequence'].popleft()
-            a_m_d = self.input_lookup[a_idx]
+            a_multi = self.input_lookup[a_idx]
             
             actions['discrete'][agent_id] = a_idx
-            actions['multi_discrete'][agent_id] = a_m_d
+            actions['multi_discrete'][agent_id] = a_multi
         
         return actions
     
