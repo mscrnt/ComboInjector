@@ -110,167 +110,176 @@ class ComboInjector(object):
         # Characters and possible moves (as a nested dict)
         self.characters = {
             'sfiii': {
-                "Alex" : {'power_bomb' : {'prob': 0.15, 'combo_str' : 'comb_hc_p'},
-                          'spiral_ddt' : {'prob' : 0.15, 'combo_str' : 'comb_hc_k'},
-                          'flash_chop' : {'prob' : 0.15, 'combo_str' : 'comb_qc_p'},
-                          'air_knee_smash' : {'prob' : 0.15, 'combo_str' : 'comb_dp_k'},
+                "Alex" : {'power_bomb' : {'prob': 0.15, 'combo_str' : 'comb_bhc_p'},
+                          'spiral_ddt' : {'prob' : 0.15, 'combo_str' : 'comb_bhc_k'},
+                          'flash_chop' : {'prob' : 0.15, 'combo_str' : 'comb_fqc_p'},
+                          'air_knee_smash' : {'prob' : 0.15, 'combo_str' : 'comb_fdp_k'},
                           'air_stampede' : {'prob' : 0.15, 'combo_str' : 'hold_d_16_64_k'},
-                          'slash_elbow' : {'prob' : 0.15, 'combo_str' : 'hold_lr_16_64_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_fc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                          'slash_elbow' : {'prob' : 0.15, 'combo_str' : 'hold_b_16_64_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_ffc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Twelve" : {'ndl' : {'prob': 0.3, 'combo_str' : 'comb_qc_p'},
-                            'axe' : {'prob': 0.3, 'combo_str' : 'comb_qc_p/rep_p_3_12_t'},
-                            'dra' : {'prob' : 0.3, 'combo_str' : 'comb_qc_k'},
-                            'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Twelve" : {'ndl' : {'prob': 0.3, 'combo_str' : 'comb_fqc_p'},
+                            'axe' : {'prob': 0.3, 'combo_str' : 'comb_bqc_p/rep_p_3_12_t'},
+                            'dra' : {'prob' : 0.3, 'combo_str' : 'comb_bqc_k'},
+                            'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Hugo" : {'shootdown_backbreaker' : {'prob': 0.15, 'combo_str' : 'comb_dp_k'},
-                            'ultra_throw' : {'prob': 0.15, 'combo_str' : 'comb_hc_k'},
-                            'moonsault_press' : {'prob' : 0.15, 'combo_str' : 'comb_fc_p'},
-                            'meat_squasher' : {'prob' : 0.15, 'combo_str' : 'comb_fc_k'},
-                            'giant_palm_bomber' : {'prob' : 0.15, 'combo_str' : 'comb_qc_p'},
-                            'monster_lariat' : {'prob' : 0.15, 'combo_str' : 'comb_qc_k'},
-                            'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mp/rep_mp_0_8_',}
+                "Hugo" : {'shootdown_backbreaker' : {'prob': 0.15, 'combo_str' : 'comb_fdp_k'},
+                            'ultra_throw' : {'prob': 0.15, 'combo_str' : 'comb_bhc_k'},
+                            'moonsault_press' : {'prob' : 0.15, 'combo_str' : 'comb_ffc_p'},
+                            'meat_squasher' : {'prob' : 0.15, 'combo_str' : 'comb_ffc_k'},
+                            'giant_palm_bomber' : {'prob' : 0.15, 'combo_str' : 'comb_bqc_p'},
+                            'monster_lariat' : {'prob' : 0.15, 'combo_str' : 'comb_fqc_k'},
+                            'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2ffc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mp/rep_mp_0_8_',}
                           },
-                "Sean" : {'zenten' : {'prob': 0.18, 'combo_str' : 'comb_qc_p'},
-                          'sean_tackle' : {'prob' : 0.18, 'combo_str' : 'comb_hc_p/rep_p_0_8_'},
-                          'dragon_smash' : {'prob' : 0.18, 'combo_str' : 'comb_dp_p'},
-                          'tornado_ryuubi_kyaku' : {'prob' : 0.36, 'combo_str' : 'comb_qc_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp/rep_mp_0_12_t',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Sean" : {'zenten' : {'prob': 0.18, 'combo_str' : 'comb_bqc_p'},
+                          'sean_tackle' : {'prob' : 0.18, 'combo_str' : 'comb_fhc_p/rep_p_0_8_'},
+                          'dragon_smash' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_p'},
+                          'tornado' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_k'},
+                          'ryuubi_kyaku' : {'prob' : 0.18, 'combo_str' : 'comb_fqc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp/rep_mp_0_12_t',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Makoto" : {'karakusa' : {'prob': 0.18, 'combo_str' : 'comb_hc_k'},
-                          'hayate_oroshi' : {'prob' : 0.36, 'combo_str' : 'comb_qc_p/rep_p_0_8_'},
-                          'fukiage' : {'prob' : 0.18, 'combo_str' : 'comb_dp_p'},
-                          'tsurugi' : {'prob' : 0.18, 'combo_str' : 'comb_qc_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Makoto" : {'karakusa' : {'prob': 0.18, 'combo_str' : 'comb_bhc_k'},
+                          'hayate' : {'prob' : 0.18, 'combo_str' : 'comb_fqc_p/rep_p_0_8_'},
+                          'fukiage' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_p'},
+                          'oroshi' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_p'},
+                          'tsurugi' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Elena" : {'rhino_horn' : {'prob': 0.18, 'combo_str' : 'comb_hc_k'},
-                          'mallet_smash' : {'prob' : 0.18, 'combo_str' : 'comb_hc_p'},
-                          'spin_scythe' : {'prob' : 0.18, 'combo_str' : 'comb_qc_k'},
-                          'scratch_wheel_lynx_tail' : {'prob' : 0.36, 'combo_str' : 'comb_dp_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mk',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Elena" : {'rhino_horn' : {'prob': 0.18, 'combo_str' : 'comb_fhc_k'},
+                          'mallet_smash' : {'prob' : 0.18, 'combo_str' : 'comb_bhc_p'},
+                          'spin_scythe' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_k'},
+                          'scratch_wheel' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_k'},
+                          'lynx_tail' : {'prob' : 0.18, 'combo_str' : 'comb_bdp_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mk',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Ibuki" : {'raida' : {'prob': 0.18, 'combo_str' : 'comb_hc_p'},
-                          'kasumi_gake_tsumuji' : {'prob' : 0.18, 'combo_str' : 'comb_qc_k'},
-                          'tsuji_goe' : {'prob' : 0.18, 'combo_str' : 'comb_dp_p'},
-                          'kunai_kubi_ori' : {'prob' : 0.18, 'combo_str' : 'comb_qc_p'},
-                          'kazekiri_hien' : {'prob' : 0.18, 'combo_str' : 'comb_dp_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp/rep_mp_0_16_t',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Ibuki" : {'raida' : {'prob': 0.13, 'combo_str' : 'comb_bhc_p'},
+                          'kasumi_gake' : {'prob' : 0.13, 'combo_str' : 'comb_fqc_k'},
+                          'tsumuji' : {'prob' : 0.12, 'combo_str' : 'comb_bqc_k'},
+                          'tsuji_goe' : {'prob' : 0.13, 'combo_str' : 'comb_fdp_p'},
+                          'kunai_kubi_ori' : {'prob' : 0.13, 'combo_str' : 'comb_fqc_p'},
+                          'kazekiri' : {'prob' : 0.13, 'combo_str' : 'comb_fdp_k'},
+                          'hien' : {'prob' : 0.13, 'combo_str' : 'comb_bdp_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp/rep_mp_0_16_t',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Chun-Li" : {'kikoken' : {'prob': 0.18, 'combo_str' : 'comb_hc_p'},
-                          'hazanshu' : {'prob' : 0.18, 'combo_str' : 'comb_hc_k'},
-                          'spinning_bird_kick' : {'prob' : 0.18, 'combo_str' : 'hold_d_16_64_k'},
-                          'hyakuretsu_kyaku' : {'prob' : 0.18, 'combo_str' : 'rep_k_3_16_t'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mk',}
+                "Chun-Li" : {'kikoken' : {'prob': 0.225, 'combo_str' : 'comb_fhc_p'},
+                          'hazanshu' : {'prob' : 0.225, 'combo_str' : 'comb_bhc_k'},
+                          'spinning_bird_kick' : {'prob' : 0.225, 'combo_str' : 'hold_d_22_64_k'},
+                          'hyakuretsu_kyaku' : {'prob' : 0.225, 'combo_str' : 'rep_k_3_16_t'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mk',}
                           },
-                "Dudley" : {'ducking_straight_short_swing_blow' : {'prob': 0.3, 'combo_str' : 'comb_hc_k/rep_p_0_4_t'},
-                            'ducking_upper_short_swing_blow' : {'prob': 0.3, 'combo_str' : 'comb_hc_k/rep_k_0_4_t'},
-                          'machine_gun_blow_cross_counter' : {'prob' : 0.3, 'combo_str' : 'comb_hc_p'},
-                          'jet_upper' : {'prob' : 0.18, 'combo_str' : 'comb_dp_p'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp/rep_mp_3_12_t',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Dudley" : {'ducking_straight' : {'prob': 0.15, 'combo_str' : 'comb_fhc_k/rep_p_0_4_t'},
+                            'ducking_upper' : {'prob': 0.15, 'combo_str' : 'comb_fhc_k/rep_k_0_4_t'},
+                          'machine_gun_blow' : {'prob' : 0.15, 'combo_str' : 'comb_fhc_p'},
+                          'cross_counter' : {'prob' : 0.15, 'combo_str' : 'comb_bhc_p'},
+                          'jet_upper' : {'prob' : 0.15, 'combo_str' : 'comb_fdp_p'},
+                          'short_swing_blow' : {'prob': 0.15, 'combo_str' : 'comb_bhc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp/rep_mp_6_18_t',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Necro" : {'snake_fang_rising_cobra' : {'prob': 0.18, 'combo_str' : 'comb_hc_k'},
-                          'denji_blast' : {'prob' : 0.18, 'combo_str' : 'comb_dp_p/rep_p_0_12_t'},
-                          'flying_viper' : {'prob' : 0.18, 'combo_str' : 'comb_qc_p'},
-                          'rising_kobra' : {'prob' : 0.18, 'combo_str' : 'comb_qc_k'},
-                          'tornado_hook' : {'prob' : 0.18, 'combo_str' : 'comb_hc_p'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp/rep_mp_0_16_t',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Necro" : {'snake_fang' : {'prob': 0.18, 'combo_str' : 'comb_fhc_k'},
+                          'denji_blast' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_p/rep_p_0_12_t'},
+                          'flying_viper' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_p'},
+                          'rising_kobra' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_k'},
+                          'tornado_hook' : {'prob' : 0.18, 'combo_str' : 'comb_fhc_p'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp/rep_mp_0_16_t',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Q" : {'capture_deadly_blow' : {'prob': 0.225, 'combo_str' : 'comb_hc_k'},
-                          'dashing_head' : {'prob' : 0.225, 'combo_str' : 'hold_lr_16_64_p/rep_p_0_8_'},
-                          'dashing_leg' : {'prob' : 0.225, 'combo_str' : 'hold_lr_16_64_k'},
-                          'high_speed_barage' : {'prob' : 0.225, 'combo_str' : 'comb_qc_p'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Q" : {'capture_deadly_blow' : {'prob': 0.225, 'combo_str' : 'comb_bhc_k'},
+                          'dashing_head' : {'prob' : 0.225, 'combo_str' : 'hold_b_22_64_p/rep_p_0_8_'},
+                          'dashing_leg' : {'prob' : 0.225, 'combo_str' : 'hold_b_22_64_k'},
+                          'high_speed_barage' : {'prob' : 0.225, 'combo_str' : 'comb_bqc_p'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Oro" : {'niu_riki' : {'prob': 0.225, 'combo_str' : 'comb_hc_p'},
-                          'nichirin_shou' : {'prob' : 0.225, 'combo_str' : 'hold_lr_16_64_p'},
+                "Oro" : {'niu_riki' : {'prob': 0.225, 'combo_str' : 'comb_bhc_p'},
+                          'nichirin_shou' : {'prob' : 0.225, 'combo_str' : 'hold_b_16_64_p'},
                           'oni_yanma' : {'prob' : 0.225, 'combo_str' : 'hold_d_16_64_p'},
-                          'jinchuu_watari_hitobashira_nobori' : {'prob' : 0.225, 'combo_str' : 'comb_qc_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp/hold_lr_4_24_p',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                          'jinchuu_watari_hitobashira_nobori' : {'prob' : 0.225, 'combo_str' : 'comb_fqc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Urien" : {'metallic_sphere' : {'prob': 0.225, 'combo_str' : 'comb_qc_p/rep_p_0_12_'},
-                          'chariot_tackle' : {'prob' : 0.225, 'combo_str' : 'hold_lr_16_64_k'},
+                "Urien" : {'metallic_sphere' : {'prob': 0.225, 'combo_str' : 'comb_fqc_p/rep_p_0_12_'},
+                          'chariot_tackle' : {'prob' : 0.225, 'combo_str' : 'hold_b_16_64_k'},
                           'dangerous_headbutt' : {'prob' : 0.225, 'combo_str' : 'hold_d_16_64_p'},
                           'violence_knee_drop' : {'prob' : 0.225, 'combo_str' : 'hold_d_16_64_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Remy" : {'light_of_virtue' : {'prob': 0.225, 'combo_str' : 'hold_lr_16_64_p'},
-                          'light_of_virtue_low' : {'prob' : 0.225, 'combo_str' : 'hold_lr_16_64_k'},
-                          'rising_rage_flash' : {'prob' : 0.225, 'combo_str' : 'hold_d_16_128_k'},
-                          'cold_blue_kick' : {'prob' : 0.225, 'combo_str' : 'comb_qc_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mk',}
+                "Remy" : {'light_of_virtue' : {'prob': 0.225, 'combo_str' : 'hold_b_22_64_p'},
+                          'light_of_virtue_low' : {'prob' : 0.225, 'combo_str' : 'hold_b_22_64_k'},
+                          'rising_rage_flash' : {'prob' : 0.225, 'combo_str' : 'hold_d_22_128_k'},
+                          'cold_blue_kick' : {'prob' : 0.225, 'combo_str' : 'comb_bqc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mk',}
                           },
-                "Ryu" : {'hadouken' : {'prob': 0.225, 'combo_str' : 'comb_qc_p'},
-                          'shoryuken' : {'prob' : 0.225, 'combo_str' : 'comb_dp_p'},
-                          'tatsumaki_senpukyaku' : {'prob' : 0.225, 'combo_str' : 'comb_qc_k'},
-                          'joudan_sokutou_geri' : {'prob' : 0.225, 'combo_str' : 'comb_hc_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mp/rep_mp_0_16_',}
+                "Ryu" : {'hadouken' : {'prob': 0.225, 'combo_str' : 'comb_fqc_p'},
+                          'shoryuken' : {'prob' : 0.225, 'combo_str' : 'comb_fdp_p'},
+                          'tatsumaki_senpukyaku' : {'prob' : 0.225, 'combo_str' : 'comb_bqc_k'},
+                          'joudan_sokutou_geri' : {'prob' : 0.225, 'combo_str' : 'comb_fhc_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mp/rep_mp_0_16_',}
                           },
-                "Gouki" : {'go_zankuu_hadouken' : {'prob': 0.15, 'combo_str' : 'comb_qc_p'},
-                          'shakenutsu-hadouken' : {'prob' : 0.15, 'combo_str' : 'comb_hc_p'},
-                          'go_shoryuken' : {'prob' : 0.15, 'combo_str' : 'comb_dp_p'},
-                          'tatsumaki_senpukyaku' : {'prob' : 0.15, 'combo_str' : 'comb_qc_k'},
-                          'hyakkishu_go' : {'prob' : 0.075, 'combo_str' : 'comb_dp_k/rep_p_0_2_t'},
-                          'hyakkishu_sho' : {'prob' : 0.075, 'combo_str' : 'comb_dp_k/rep_k_0_2_t'},
-                          'hyakkishu_sho_sai' : {'prob' : 0.075, 'combo_str' : 'comb_dp_k/rep_mpk_0_2_t'},
-                          'shun_goku_satsu' : {'prob' : 0.055, 'combo_str' : 'raw_+lp_+_+lp/comb_lr_/raw_+lk_+_+hp'},
+                "Gouki" : {'go_zankuu_hadouken' : {'prob': 0.15, 'combo_str' : 'comb_fqc_p'},
+                          'shakenutsu-hadouken' : {'prob' : 0.15, 'combo_str' : 'comb_bhc_p'},
+                          'go_shoryuken' : {'prob' : 0.15, 'combo_str' : 'comb_fdp_p'},
+                          'tatsumaki_senpukyaku' : {'prob' : 0.15, 'combo_str' : 'comb_bqc_k'},
+                          'hyakkishu_go' : {'prob' : 0.075, 'combo_str' : 'comb_fdp_k/rep_p_0_2_t'},
+                          'hyakkishu_sho' : {'prob' : 0.075, 'combo_str' : 'comb_fdp_k/rep_k_0_2_t'},
+                          'hyakkishu_sho_sai' : {'prob' : 0.075, 'combo_str' : 'comb_fdp_k/rep_mpk_0_2_t'},
+                          'shungokusatsu' : {'prob' : 0.055, 'combo_str' : 'raw_+lp_+_+lp/comb_f_/raw_+lk_+_+hp'},
                           'target_combo_1' : {'prob' : 0.02, 'combo_str' : 'rep_mp_5_5_t/raw_+/rep_hp_5_5_t'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mk',}
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mk',}
                           },
-                "Yun" : {'zenpou_tenshin' : {'prob': 0.225, 'combo_str' : 'comb_hc_k'},
-                          'kobokushi_zesshou_hohou' : {'prob' : 0.225, 'combo_str' : 'comb_qc_p'},
-                          'tetsuzanko' : {'prob' : 0.225, 'combo_str' : 'comb_dp_p'},
-                          'nishoukyaku' : {'prob' : 0.225, 'combo_str' : 'comb_dp_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mp',
-                                         'combo_str_3' : 'comb_2qc_mk',}
+                "Yun" : {'zenpou_tenshin' : {'prob': 0.18, 'combo_str' : 'comb_bhc_k'},
+                          'kobokushi' : {'prob' : 0.18, 'combo_str' : 'comb_bqc_p'},
+                          'zesshou_hohou' : {'prob' : 0.18, 'combo_str' : 'comb_fqc_p'},
+                          'tetsuzanko' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_p'},
+                          'nishoukyaku' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mp',
+                                         'combo_str_3' : 'comb_2fqc_mk',}
                           },
-                "Yang" : {'tourou_zan_byakko_soushouda' : {'prob': 0.225, 'combo_str' : 'comb_qc_p'},
-                          'senkyuutai' : {'prob' : 0.225, 'combo_str' : 'comb_qc_k'},
-                          'zenpou_tenshin' : {'prob' : 0.225, 'combo_str' : 'comb_hc_k'},
-                          'kaihou' : {'prob' : 0.225, 'combo_str' : 'comb_dp_k'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk',
-                                         'combo_str_3' : 'comb_2qc_mp',}
+                "Yang" : {'tourou_zan' : {'prob': 0.18, 'combo_str' : 'comb_fqc_p'},
+                          'byakko_soushouda' : {'prob': 0.18, 'combo_str' : 'comb_bqc_p'},
+                          'senkyuutai' : {'prob' : 0.18, 'combo_str' : 'comb_fqc_k'},
+                          'zenpou_tenshin' : {'prob' : 0.18, 'combo_str' : 'comb_bhc_k'},
+                          'kaihou' : {'prob' : 0.18, 'combo_str' : 'comb_fdp_k'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk',
+                                         'combo_str_3' : 'comb_2fqc_mp',}
                           },
-                "Ken" : {'hadouken' : {'prob': 0.225, 'combo_str' : 'comb_qc_p'},
-                          'shoryuken' : {'prob' : 0.225, 'combo_str' : 'comb_dp_p'},
-                          'tatsumaki_senpukyaku' : {'prob' : 0.225, 'combo_str' : 'comb_qc_k'},
-                          'grab' : {'prob' : 0.225, 'combo_str' : 'rep_lpk_1_8_t'},
-                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2qc_mp',
-                                         'combo_str_2' : 'comb_2qc_mk/rep_mk_0_16_t',
-                                         'combo_str_3' : 'comb_2qc_mk',}
+                "Ken" : {'hadouken' : {'prob': 0.25, 'combo_str' : 'comb_fqc_p'},
+                          'shoryuken' : {'prob' : 0.25, 'combo_str' : 'comb_fdp_p'},
+                          'tatsumaki_senpukyaku' : {'prob' : 0.25, 'combo_str' : 'comb_bqc_k'},
+                          'grab' : {'prob' : 0.15, 'combo_str' : 'rep_lpk_1_8_t'},
+                          'super_art' : {'prob' : 0.1, 'combo_str_1' : 'comb_2fqc_mp',
+                                         'combo_str_2' : 'comb_2fqc_mk/rep_mk_0_16_t',
+                                         'combo_str_3' : 'comb_2fqc_mk',}
                           },
             },
         }
@@ -339,10 +348,24 @@ class ComboInjector(object):
             'lfc':  ['l', 'dl', 'd', 'dr', 'r', 'ur', 'u', 'ul'],
             'sr':   ['r', '', 'r'],
             'sl':   ['l', '', 'l'],
-            'sur':  ['d', 'ur'],
-            'su':   ['d', 'u'],
-            'sul':  ['d', 'ul'],
-        }
+            'sjr':  ['d', 'ur'],
+            'sj':   ['d', 'u'],
+            'sjl':  ['d', 'ul'],
+            }
+        
+        
+        self.direction_move_patterns = {
+            'fqc' : [['rqc'], ['lqc'], ['rqc', 'lqc']],
+            'bqc' : [['lqc'], ['rqc'], ['rqc', 'lqc']],
+            'fhc' : [['rhc'], ['lhc'], ['rhc', 'lhc']],
+            'bhc' : [['lhc'], ['rhc'], ['rhc', 'lhc']],
+            'fdp' : [['rdp'], ['ldp'], ['rdp', 'ldp']],
+            'bdp' : [['ldp'], ['rdp'], ['rdp', 'ldp']],
+            'ffc' : [['rfc'], ['lfc'], ['rfc', 'lfc']],
+            'bfc' : [['lfc'], ['rfc'], ['rfc', 'lfc']],
+            'sf' : [['sr'], ['sl'], ['sr', 'sl']],
+            'sb' : [['sl'], ['sr'], ['sr', 'sl']],
+            }
 
         # Store per-agent state (character, super_art, move_sequence, etc.)
         self.agent_state = {}
@@ -389,7 +412,7 @@ class ComboInjector(object):
         """
         return len(self.agent_state[player]['move_sequence']) > 0
     
-    def _combine_actions(self, move_string: str, attack_string: str) -> list:
+    def _combine_actions(self, move_string: str, attack_string: str, side: int = -1) -> list:
         """
         Internal helper that stitches together a movement pattern with an attack.
 
@@ -408,24 +431,32 @@ class ComboInjector(object):
         """
         
         # Parse the move_string to get a movement list
-        if move_string == 'qc':
-            m_seq = self.move_pattern_names[np.random.choice(['rqc', 'lqc'])]
-        elif move_string == '2qc':
-            m_seq = self.move_pattern_names[np.random.choice(['rqc', 'lqc'])] * 2
-        elif move_string == 'hc':
-            m_seq = self.move_pattern_names[np.random.choice(['rhc', 'lhc'])]
-        elif move_string == 'fc':
-            m_seq = self.move_pattern_names[np.random.choice(['rfc', 'lfc'])]
-        elif move_string == '2fc':
-            m_seq = self.move_pattern_names[np.random.choice(['rfc', 'lfc'])] * 2
-        elif move_string == 'dp':
-            m_seq = self.move_pattern_names[np.random.choice(['rdp', 'ldp'])]
-        elif move_string == '2dp':
-            m_seq = self.move_pattern_names[np.random.choice(['rdp', 'ldp'])] * 2
-        elif move_string == 'lr':
-            m_seq = [np.random.choice(['l', 'r'])]
+        reps = 1
+        if move_string.startswith('2'):
+            move_string = move_string[1:]
+            reps = 2
+            
+        if move_string in self.direction_move_patterns:
+            directional_move = np.random.choice(self.direction_move_patterns[move_string][side])
+            m_seq = self.move_pattern_names[directional_move]
+        elif move_string == 'f':
+            if side == 0:
+                m_seq = ['r']
+            elif side == 1:
+                m_seq = ['l']
+            else:
+                m_seq = [np.random.choice(['l', 'r'])]
+        elif move_string == 'b':
+            if side == 0:
+                m_seq = ['l']
+            elif side == 1:
+                m_seq = ['r']
+            else:
+                m_seq = [np.random.choice(['l', 'r'])]
         else:
             m_seq = [move_string]
+        
+        m_seq = m_seq * reps
         
         # Decide the final attack
         if attack_string == 'p':
@@ -439,7 +470,7 @@ class ComboInjector(object):
         a_seq = [''] * (len(m_seq) - 1) + [a]
         return [f"{m}+{atk}" for m, atk in zip(m_seq, a_seq)] 
     
-    def _hold_direction(self, direction: str, min_frame: str, max_frame: str, release: str = '') -> list:
+    def _hold_direction(self, direction: str, min_frame: str, max_frame: str, release: str = '', side: int = -1) -> list:
         """
         Internal helper for a "hold direction" move, e.g. hold down for N frames, then release.
 
@@ -473,7 +504,14 @@ class ComboInjector(object):
         
         # Build the direction sequence
         if direction == 'd':
-            dir_held = np.random.choice(['d', 'dl', 'dr'])
+            options = ['d']
+            if side == 0:
+                options += ['dl']
+            elif side == 1:
+                options += ['dr']
+            else:
+                options += ['dl', 'dr']
+            dir_held = np.random.choice(options)
             # If there's a release, append 'u' after
             # Example: hold [d, d, d], then 'u'
             m_seq = [dir_held] * num_steps
@@ -481,8 +519,15 @@ class ComboInjector(object):
                 m_seq.append('u')
             a_seq = [''] * (len(m_seq) - bool(release)) + [release] * bool(release)
             
-        elif direction == 'lr':
-            dir_held = np.random.choice(['l', 'dl', 'dr', 'r'])
+        elif direction == 'b':
+            options = []
+            if side == 0:
+                options += ['dl', 'l']
+            elif side == 1:
+                options += ['dr', 'r']
+            else:
+                options += ['dl', 'dr', 'l', 'r']
+            dir_held = np.random.choice(options)
             m_seq = [dir_held] * num_steps  
             # If there's a release, we do the opposite direction or something else
             if release:
@@ -530,7 +575,7 @@ class ComboInjector(object):
         seq = [f'+{attack_string}'] + ['+'] * do_tap
         return seq * reps
        
-    def _decode_action_string(self, action_string: str) -> list:
+    def _decode_action_string(self, action_string: str, side: int = -1) -> list:
         """
         Parse the custom combo syntax into final 'dir+attack' tokens.
 
@@ -555,11 +600,11 @@ class ComboInjector(object):
             if parts[0] == 'comb':
                 # comb_qc_p
                 move_str, attack_str = parts[1], parts[2]
-                action_sequence += self._combine_actions(move_str, attack_str)
+                action_sequence += self._combine_actions(move_str, attack_str, side)
             elif parts[0] == 'hold':
                 # hold_direction
                 direction, min_frame, max_frame, release = parts[1:]
-                action_sequence += self._hold_direction(direction, min_frame, max_frame, release)
+                action_sequence += self._hold_direction(direction, min_frame, max_frame, release, side)
             elif parts[0] == 'rep':
                 # repeated attack
                 attack_str, min_r, max_r, tap_str = parts[1:]
@@ -581,7 +626,7 @@ class ComboInjector(object):
         """
         return len(self._base_actions)
         
-    def sample_character_special(self, player: str) -> list:
+    def sample_character_special(self, player: str, side: int = -1) -> list:
         """
         Generates a special or super-art combo for the given agent's character.
 
@@ -617,11 +662,11 @@ class ComboInjector(object):
                     suffix = f"_{super_art}"
                     combo_key = 'combo_str' + suffix
                     action_str = params[combo_key]
-                    return self._decode_action_string(action_str)
+                    return self._decode_action_string(action_str, side)
                 else:
                     # Normal move
                     action_str = params['combo_str']
-                    return self._decode_action_string(action_str)
+                    return self._decode_action_string(action_str, side)
         # If none matched (sum of probabilities < 1?), fallback
         return [np.random.choice(self._base_actions)]
             
@@ -700,11 +745,12 @@ class ComboInjector(object):
         return idx_list
 
     def sample(self,
-               prob_jump: float = 0.04,
-               prob_basic: float = 0.21,
-               prob_combo: float = 0.35,
+               sides: list = [],
+               prob_jump: float = 0.05,
+               prob_basic: float = 0.40,
+               prob_combo: float = 0.30,
                prob_cancel: float = 0.2,
-               prob_movement: float = 0.3):
+               prob_movement: float = 0.25):
         """
         Main entry point to produce the next action(s) for all agents.
 
@@ -748,6 +794,9 @@ class ComboInjector(object):
         3. Once a new sequence is sampled, we store it in the agent's 'move_sequence' deque.
         4. Finally, we pop one action from each agent's queue and return it.
         """
+        if len(sides) != len(self.agent_state):
+            sides = [-1] * len(self.agent_state)
+        
         actions = {'discrete' : {},
                    'multi_discrete' : {}}
         
@@ -757,9 +806,10 @@ class ComboInjector(object):
         cdfs = np.cumsum(raw_probs)
         
         # For each agent, pick next action if needed
-        for agent_id in self.agent_state:
+        for i, agent_id in enumerate(self.agent_state):
             if not self.in_sequence(agent_id):
                 roll = np.random.rand()
+                side = sides[i]
                 # Decide which category
                 if roll < cdfs[0]:
                     # Jump
@@ -772,7 +822,7 @@ class ComboInjector(object):
                     self.agent_state[agent_id]['move_sequence'] = deque([single_idx])
                 elif roll < cdfs[2]:
                     # Character-specific combos
-                    seq_str = self.sample_character_special(agent_id)
+                    seq_str = self.sample_character_special(agent_id, side=side)
                     seq_idx = self.string_to_idx(seq_str)
                     # Possibly cancel early
                     if np.random.rand() < prob_cancel:
