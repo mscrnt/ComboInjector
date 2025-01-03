@@ -37,7 +37,9 @@ injector.reset(characters, super_arts)
 
 # 3) Sampling actions
 # We can sample with default or custom probabilities
-actions = injector.sample(prob_jump=0.05,
+# We can also sample from actions based on each character's side (0 = left, 1 = right, -1 = unspecified)
+actions = injector.sample(sides=[0, 1],
+                          prob_jump=0.05,
                           prob_basic=0.25,
                           prob_combo=0.40,
                           prob_cancel=0.20,
@@ -48,7 +50,7 @@ print("Discrete action for agent_0:", actions['discrete']['agent_0'])
 print("Multi-discrete array for agent_0:", actions['multi_discrete']['agent_0'])
 
 # 4) Next time step
-actions_next = injector.sample()
+actions_next = injector.sample(sides=[1, 0])
 # If the agent has a queued combo, the next step of that combo is popped automatically.
 
 ```
