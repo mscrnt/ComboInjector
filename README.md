@@ -120,10 +120,12 @@ This project is licensed under the **MIT License**.
 
 This project was **forked from** [Nebraskinator/ComboInjector](https://github.com/Nebraskinator/ComboInjector) and customized for DIAMBRA Arena.
 
-- **DIAMBRA Arena** - For providing a flexible RL framework for fighting games.
+- **DIAMBRA Arena** - For providing a flexible RL framework for fighting games.  
+  - Documentation: [https://docs.diambra.ai/](https://docs.diambra.ai/)  
+  - GitHub: [https://github.com/diambra/](https://github.com/diambra/)  
+  - Website: [https://diambra.ai/](https://diambra.ai/)  
 - **Stable-Baselines3** - For robust RL implementations.
 - **Gymnasium** - For providing standardized RL environments.
-- **[Nebraskinator/ComboInjector](https://github.com/Nebraskinator/ComboInjector)** - The original project that inspired this fork and customizations.
 
 ---
 
