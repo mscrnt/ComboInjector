@@ -1,57 +1,133 @@
-# ComboInjector
-
-A utility class for injecting combos, special moves, and basic actions in a fighting game environment. 
-Currently tailored for _Street Fighter III_ (sfiii) with **multi-discrete** action spaces.
+# ComboInjector - Custom Wrapper for DIAMBRA Arena
 
 ## Overview
 
-`ComboInjector` manages:
+The **ComboInjector** module is a custom **Gymnasium** wrapper designed for **DIAMBRA Arena** environments. It enables **automated combo injection** for fighting game agents, allowing them to execute **predefined special moves and super arts** as part of their reinforcement learning training.
 
-- **Characters** and their special moves, each with probabilities.
-- A method to **sample** new actions or combos for one or more agents.
-- **Queued** sequences of moves (combos) that it executes one step at a time.
-- Probability-based selection among jump, basic single-step, combos, or movement patterns.
+This project is a **fork and extension** of [Nebraskinator/ComboInjector](https://github.com/Nebraskinator/ComboInjector), modified to integrate seamlessly with **Stable-Baselines3 PPO** and DIAMBRA's environment handling.
 
-## Key Features
+### Module Components
 
-- **Configurable** probabilities for each action category (jump / basic / combos / movement).
-- **Frame skip** logic for charge and hold-based combos.
-- **Reset** method to assign characters and super arts to each agent.
-- **Multi-agent** friendly: Each agent maintains its own queue of moves.
+The module consists of the following files:
+
+- `ComboInjector/__init__.py` - Initializes the module and defines base movement/attack mappings.
+- `ComboInjector/action_utils.py` - Contains utilities for parsing and processing action strings.
+- `ComboInjector/combo_injector.py` - Implements the **ComboInjector** class, which injects combo actions into the environment.
+- `ComboInjector/combo_wrapper.py` - Implements **ComboWrapper**, a Gymnasium wrapper that integrates ComboInjector into an environment.
+
+## Features
+
+✔ **Automated combo execution** - Allows agents to execute **predefined character-specific combos**.  
+✔ **Configurable action modes** - Supports **multi_discrete** action spaces.  
+✔ **Decay Mechanism** - Injection probability can **decay over time**, simulating skill progression.  
+✔ **Custom environment support** - Works with **DIAMBRA Arena** environment.  
+✔ **Seamless RL training integration** - Easily integrates with **Stable-Baselines3 PPO** training.  
+
+---
+
+## Installation
+
+Clone this repository and install the dependencies:
+
+```bash
+git clone https://github.com/your-repo/diambra-combo-injector.git
+cd diambra-combo-injector
+```
+
+---
 
 ## Usage
 
+### 1️⃣ Wrapping an Environment with `ComboWrapper`
+
+To use **ComboWrapper**, simply wrap your environment:
+
+```python
+from diambra.arena import make_sb3_env, EnvironmentSettings, WrappersSettings
+from ComboInjector.combo_wrapper import ComboWrapper
+
+# Define environment settings
+env_settings = EnvironmentSettings(game_id="sfiii3n", characters=["Ken"], super_art=[2])
+wrappers_settings = WrappersSettings()
+
+# Define ComboInjector settings
+injector_kwargs = {
+    "environment_name": env_settings.game_id,
+    "frame_skip": 4,
+    "mode": "multi_discrete",
+    "total_decay_steps": 32000000,  # Set to 0 to disable decay
+}
+
+# Add ComboWrapper to the environment
+wrappers_settings.wrappers.append([
+    ComboWrapper, {"injector_kwargs": injector_kwargs, "characters": ["Ken"], "super_arts": [2]}
+])
+
+# Create the wrapped environment
+env, num_envs = make_sb3_env(env_settings.game_id, env_settings, wrappers_settings)
+print(f"Activated {num_envs} environment(s)")
 ```
-from ComboInjector import ComboInjector
 
-# 1) Instantiate the class
-injector = ComboInjector(environment_name='sfiii',
-                         mode='multi_discrete',
-                         frame_skip=4)
+---
 
-# 2) Reset with specific characters and super arts for each agent
-# Suppose we have 2 players:
-characters = ['Alex', 'Gouki']
-super_arts = [1, 2]  # super art indices
-injector.reset(characters, super_arts)
+### 3️⃣ Disabling Decay
 
-# 3) Sampling actions
-# We can sample with default or custom probabilities
-# We can also sample from actions based on each character's side (0 = left, 1 = right, -1 = unspecified)
-actions = injector.sample(sides=[0, 1],
-                          prob_jump=0.05,
-                          prob_basic=0.25,
-                          prob_combo=0.40,
-                          prob_cancel=0.20,
-                          prob_movement=0.35)
+By default, **combo injection probability decays over time**. To disable this feature and ensure that **combos are always injected**, set `total_decay_steps=0` when initializing the **ComboInjector**:
 
-# 'actions' is a dict with 'discrete' indices and 'multi_discrete' arrays for each agent
-print("Discrete action for agent_0:", actions['discrete']['agent_0'])
-print("Multi-discrete array for agent_0:", actions['multi_discrete']['agent_0'])
+```python
+injector_kwargs = {
+    "environment_name": "sfiii3n",
+    "frame_skip": 4,
+    "mode": "multi_discrete",
+    "total_decay_steps": 0,  # No decay, combos always active
+}
+```
 
-# 4) Next time step
-actions_next = injector.sample(sides=[1, 0])
-# If the agent has a queued combo, the next step of that combo is popped automatically.
+---
+
+## File Structure
 
 ```
+ComboInjector/
+├── __init__.py         # Base mappings and module initialization
+├── action_utils.py     # Action processing utilities
+├── combo_injector.py   # Core combo injection logic
+└── combo_wrapper.py    # Gymnasium wrapper
+```
+
+---
+
+## Configuration Options
+
+### `ComboInjector` Parameters
+
+| Parameter           | Type  | Default            | Description                                                                      |
+| ------------------- | ----- | ------------------ | -------------------------------------------------------------------------------- |
+| `environment_name`  | `str` | `'sfiii3n'`        | Environment ID                                                                   |
+| `mode`              | `str` | `'multi_discrete'` | Action mode                                                                      |
+| `frame_skip`        | `int` | `4`                | Frame skipping for hold/charge moves                                             |
+| `total_decay_steps` | `int` | `16000000`         | Steps over which injection probability decays to 0. Set to `0` to disable decay. |
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## Acknowledgments
+
+This project was **forked from** [Nebraskinator/ComboInjector](https://github.com/Nebraskinator/ComboInjector) and customized for DIAMBRA Arena.
+
+- **DIAMBRA Arena** - For providing a flexible RL framework for fighting games.
+- **Stable-Baselines3** - For robust RL implementations.
+- **Gymnasium** - For providing standardized RL environments.
+- **[Nebraskinator/ComboInjector](https://github.com/Nebraskinator/ComboInjector)** - The original project that inspired this fork and customizations.
+
+---
+
+## Contact
+
+For questions, issues, or contributions, please open an **issue** or submit a **pull request** on GitHub.
 
