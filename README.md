@@ -30,8 +30,8 @@ The module consists of the following files:
 Clone this repository and install the dependencies:
 
 ```bash
-git clone https://github.com/your-repo/diambra-combo-injector.git
-cd diambra-combo-injector
+git clone https://github.com/mscrnt/ComboInjector.git
+cd ComboInjector
 ```
 
 ---
